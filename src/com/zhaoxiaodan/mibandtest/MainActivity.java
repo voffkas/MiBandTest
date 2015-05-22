@@ -15,8 +15,9 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity
 {
-	private static final String	TAG	= "==[shouhuantest]==";
-	private static final String RSSI_KEY = "RSSI";
+	private static final String	TAG	= "==[mibandtest]==";
+	private static final String DATA_KEY_RSSI = "RSSI";
+	private static final String DATA_KEY_DEVICES = "DEVICES";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -24,14 +25,15 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		final TextView view = (TextView) MainActivity.this.findViewById(R.id.textView1);
-		
 		final Handler handler = new Handler(new Callback() {
 			
 			@Override
 			public boolean handleMessage(Message msg)
 			{
-				view.setText(msg.getData().getInt(RSSI_KEY)+"");
+				((TextView) MainActivity.this.findViewById(R.id.rssiTextView)).setText(msg.getData().getInt(DATA_KEY_RSSI)+"");
+				BluetoothDevice device = (BluetoothDevice) msg.getData().getParcelable(DATA_KEY_DEVICES);
+				((TextView) MainActivity.this.findViewById(R.id.nameTextView)).setText(device.getName());
+				((TextView) MainActivity.this.findViewById(R.id.addressTextView)).setText(device.getAddress());
 				return true;
 			}
 		});
@@ -48,7 +50,8 @@ public class MainActivity extends Activity
 						+",rssi:"+rssi);
 				
 				Bundle data = new Bundle();
-				data.putInt(RSSI_KEY, rssi);
+				data.putInt(DATA_KEY_RSSI, rssi);
+				data.putParcelable(DATA_KEY_DEVICES, device);
 				Message msg = new Message();
 				msg.setData(data);
 				handler.sendMessage(msg);
@@ -56,7 +59,7 @@ public class MainActivity extends Activity
 			}
 		};
 		
-		Button button = (Button) findViewById(R.id.button1);
+		Button button = (Button) findViewById(R.id.startButton);
 		button.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -74,7 +77,7 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		Button button2 = (Button) findViewById(R.id.button2);
+		Button button2 = (Button) findViewById(R.id.stopButon);
 		button2.setOnClickListener(new OnClickListener() {
 
 			@Override
