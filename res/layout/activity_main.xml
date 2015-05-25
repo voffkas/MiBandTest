@@ -8,49 +8,49 @@
     android:paddingTop="@dimen/activity_vertical_margin" >
 
     <Button
-        android:id="@+id/startButton"
+        android:id="@+id/connectButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
-        android:text="StartScan" />
+        android:text="Connect" />
 
     <Button
-        android:id="@+id/stopButon"
+        android:id="@+id/pairButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="30dp"
-        android:text="StopScan" />
+        android:text="pair" />
 
     <TextView
-        android:id="@+id/addressTextView"
+        android:id="@+id/statusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="address"
-        android:textSize="30sp" />
-
-    <TextView
-        android:id="@+id/nameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/addressTextView"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="44dp"
-        android:text="name"
+        android:layout_marginBottom="41dp"
+        android:text="status"
         android:textSize="30sp" />
 
-    <TextView
-        android:id="@+id/rssiTextView"
+    <Button
+        android:id="@+id/batteryInfoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/addressTextView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:text="rssi"
-        android:textSize="30sp" />
+        android:layout_alignBaseline="@+id/readRssiButton"
+        android:layout_alignBottom="@+id/readRssiButton"
+        android:layout_alignRight="@+id/pairButton"
+        android:text="batteryInfo" />
+
+    <Button
+        android:id="@+id/readRssiButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/connectButton"
+        android:layout_below="@+id/connectButton"
+        android:layout_marginTop="40dp"
+        android:text="readrssi" />
 
 </RelativeLayout>

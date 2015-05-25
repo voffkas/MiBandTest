@@ -1,8 +1,6 @@
 package com.zhaoxiaodan.mibandtest;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Handler.Callback;
@@ -13,11 +11,25 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.zhaoxiaodan.miband.ActionCallback;
+import com.zhaoxiaodan.miband.BatteryInfo;
+import com.zhaoxiaodan.miband.MiBand;
+
 public class MainActivity extends Activity
 {
-	private static final String	TAG	= "==[mibandtest]==";
-	private static final String DATA_KEY_RSSI = "RSSI";
-	private static final String DATA_KEY_DEVICES = "DEVICES";
+	private static final String	TAG					= "==[mibandtest]==";
+	private static final String	DATA_KEY_MSG		= "DATA_KEY_MSG";
+	private MiBand				miband;
+
+	final Handler handler = new Handler(new Callback() {
+
+		@Override
+		public boolean handleMessage(Message msg)
+		{
+			((TextView) MainActivity.this.findViewById(R.id.statusTextView)).setText(msg.getData().getString(DATA_KEY_MSG));
+			return true;
+		}
+	});
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -25,50 +37,65 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		final Handler handler = new Handler(new Callback() {
-			
-			@Override
-			public boolean handleMessage(Message msg)
-			{
-				((TextView) MainActivity.this.findViewById(R.id.rssiTextView)).setText(msg.getData().getInt(DATA_KEY_RSSI)+"");
-				BluetoothDevice device = (BluetoothDevice) msg.getData().getParcelable(DATA_KEY_DEVICES);
-				((TextView) MainActivity.this.findViewById(R.id.nameTextView)).setText(device.getName());
-				((TextView) MainActivity.this.findViewById(R.id.addressTextView)).setText(device.getAddress());
-				return true;
-			}
-		});
+		miband = new MiBand(this);
+
 		
-		final BluetoothAdapter.LeScanCallback	mLeScanCallback	= new BluetoothAdapter.LeScanCallback() {
-			@Override
-			public void onLeScan(final BluetoothDevice device, final int rssi,
-					final byte[] scanRecord)
-			{
-				Log.i(TAG, "name:"+device.getName()
-						+",add:"+device.getAddress()
-						+",type:"+device.getType()
-						+",bondState:"+device.getBondState()
-						+",rssi:"+rssi);
-				
-				Bundle data = new Bundle();
-				data.putInt(DATA_KEY_RSSI, rssi);
-				data.putParcelable(DATA_KEY_DEVICES, device);
-				Message msg = new Message();
-				msg.setData(data);
-				handler.sendMessage(msg);
-				
-			}
-		};
-		
-		Button button = (Button) findViewById(R.id.startButton);
-		button.setOnClickListener(new OnClickListener() {
+
+		((Button) findViewById(R.id.connectButton)).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v)
 			{
 				try
 				{
-					BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-					adapter.startLeScan(mLeScanCallback);
+					
+					 miband.connect(new ActionCallback() {
+						
+						@Override
+						public void onSuccess(Object data)
+						{
+							Log.d(TAG,"connect success");
+							
+							changeStatus("connected!");
+						}
+						
+						@Override
+						public void onFail(int errorCode, String msg)
+						{
+							Log.d(TAG,"connect fail, code:"+errorCode+",mgs:"+msg);
+							
+							changeStatus("connect fail");
+						}
+					});
+				} catch (Throwable e)
+				{
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		((Button) findViewById(R.id.pairButton)).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v)
+			{
+				try
+				{
+					miband.pair(new ActionCallback() {
+						
+						@Override
+						public void onSuccess(Object data)
+						{
+							changeStatus("pair succ");
+						}
+						
+						@Override
+						public void onFail(int errorCode, String msg)
+						{
+							changeStatus("pair fail");
+						}
+					});
 				} catch (Throwable e)
 				{
 					e.printStackTrace();
@@ -77,16 +104,27 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		Button button2 = (Button) findViewById(R.id.stopButon);
-		button2.setOnClickListener(new OnClickListener() {
+		((Button) findViewById(R.id.readRssiButton)).setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v)
 			{
 				try
 				{
-					BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-					adapter.stopLeScan(mLeScanCallback);
+					miband.readRssi(new ActionCallback() {
+						
+						@Override
+						public void onSuccess(Object data)
+						{
+							changeStatus("rssi:"+(int)data);
+						}
+						
+						@Override
+						public void onFail(int errorCode, String msg)
+						{
+							changeStatus("readRssi fail");
+						}
+					});
 				} catch (Throwable e)
 				{
 					e.printStackTrace();
@@ -95,6 +133,45 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		
+		((Button) findViewById(R.id.batteryInfoButton)).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v)
+			{
+				try
+				{
+					miband.getBatteryInfo(new ActionCallback() {
+						
+						@Override
+						public void onSuccess(Object data)
+						{
+							BatteryInfo info = (BatteryInfo)data;
+							Log.d(TAG, info.toString());
+							changeStatus(info.toString());
+						}
+						
+						@Override
+						public void onFail(int errorCode, String msg)
+						{
+							changeStatus("readRssi fail");
+						}
+					});
+				} catch (Throwable e)
+				{
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+	}
+	
+	private void changeStatus(String status)
+	{
+		Bundle bundle = new Bundle();
+		bundle.putString(DATA_KEY_MSG, status);
+		Message msg = new Message();
+		msg.setData(bundle);
+		handler.sendMessage(msg);
 	}
 }
