@@ -6,38 +6,45 @@ import android.app.ListActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 
 import com.zhaoxiaodan.miband.ActionCallback;
-import com.zhaoxiaodan.miband.BatteryInfo;
 import com.zhaoxiaodan.miband.MiBand;
 import com.zhaoxiaodan.miband.NotifyListener;
 import com.zhaoxiaodan.miband.RealtimeStepsNotifyListener;
+import com.zhaoxiaodan.miband.model.BatteryInfo;
+import com.zhaoxiaodan.miband.model.LedColor;
+import com.zhaoxiaodan.miband.model.UserInfo;
+import com.zhaoxiaodan.miband.model.VibrationMode;
 
 public class MainActivity extends ListActivity
 {
-	private static final String	TAG				= "==[mibandtest]==";
-	private static final String	DATA_KEY_MSG	= "DATA_KEY_MSG";
+	private static final String	TAG		= "==[mibandtest]==";
 	private MiBand				miband;
 	
-	static final String[]		BUTTONS			= new String[] {
-												"Connect",
-												"pair",
-												"read_rssi",
-												"battery_info",
-												"startVibration",
-												"stopVibration",
-												"setNormalNotifyListener",
-												"setRealtimeStepsNotifyListener",
-												"enableRealtimeStepsNotify",
-												"setColorBlue",
-												"setUserInfo",
-												};
+	static final String[]		BUTTONS	= new String[] {
+										"Connect",
+										"setUserInfo",
+										"pair",
+										"read_rssi",
+										"battery_info",
+										"miband.startVibration(VibrationMode.VIBRATION_WITH_LED);",
+										"miband.startVibration(VibrationMode.VIBRATION_WITHOUT_LED);",
+										"miband.startVibration(VibrationMode.VIBRATION_UNTIL_CALL_STOP);",
+										"stopVibration",
+										"setNormalNotifyListener",
+										"setRealtimeStepsNotifyListener",
+										"enableRealtimeStepsNotify",
+										"disableRealtimeStepsNotify",
+										"miband.setLedColor(LedColor.ORANGE);",
+										"miband.setLedColor(LedColor.BLUE);",
+										"miband.setLedColor(LedColor.RED);",
+										"miband.setLedColor(LedColor.GREEN);",
+										"selfTest",
+										};
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -68,6 +75,12 @@ public class MainActivity extends ListActivity
 							Log.d(TAG, "connect fail, code:" + errorCode + ",mgs:" + msg);
 						}
 					});
+				}
+				else if (position == menuIndex++)
+				{
+					UserInfo userInfo = new UserInfo(20111111, 1, 32, 180, 55, "胖梁", 1);
+					Log.d(TAG, "setUserInfo:" + userInfo.toString() + ",data:" + Arrays.toString(userInfo.getBytes(miband.getDevice().getAddress())));
+					miband.setUserInfo(userInfo);
 				}
 				else if (position == menuIndex++)
 				{
@@ -123,7 +136,15 @@ public class MainActivity extends ListActivity
 				}
 				else if (position == menuIndex++)
 				{
-					miband.startVibration();
+					miband.startVibration(VibrationMode.VIBRATION_WITH_LED);
+				}
+				else if (position == menuIndex++)
+				{
+					miband.startVibration(VibrationMode.VIBRATION_WITHOUT_LED);
+				}
+				else if (position == menuIndex++)
+				{
+					miband.startVibration(VibrationMode.VIBRATION_UNTIL_CALL_STOP);
 				}
 				else if (position == menuIndex++)
 				{
@@ -157,11 +178,27 @@ public class MainActivity extends ListActivity
 				}
 				else if (position == menuIndex++)
 				{
-					miband.setColorBlue();
+					miband.disableRealtimeStepsNotify();
 				}
 				else if (position == menuIndex++)
 				{
-					miband.setUserInfo(new byte[]{25, 113, 53, 1, 1, 32, -83, 55, 1, -24, -125, -106, -26, -94, -127, 0, 0, 0, 0, 35});
+					miband.setLedColor(LedColor.ORANGE);
+				}
+				else if (position == menuIndex++)
+				{
+					miband.setLedColor(LedColor.BLUE);
+				}
+				else if (position == menuIndex++)
+				{
+					miband.setLedColor(LedColor.RED);
+				}
+				else if (position == menuIndex++)
+				{
+					miband.setLedColor(LedColor.GREEN);
+				}
+				else if (position == menuIndex++)
+				{
+					miband.selfTest();
 				}
 			}
 		});
