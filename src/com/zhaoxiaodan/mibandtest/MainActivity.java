@@ -78,7 +78,7 @@ public class MainActivity extends ListActivity
 				}
 				else if (position == menuIndex++)
 				{
-					UserInfo userInfo = new UserInfo(20111111, 1, 32, 180, 55, "胖梁", 1);
+					UserInfo userInfo = new UserInfo(20111111, 1, 32, 180, 55, "胖梁", 0);
 					Log.d(TAG, "setUserInfo:" + userInfo.toString() + ",data:" + Arrays.toString(userInfo.getBytes(miband.getDevice().getAddress())));
 					miband.setUserInfo(userInfo);
 				}
